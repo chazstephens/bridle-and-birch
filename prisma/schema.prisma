@@ -1,0 +1,106 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  price        Float
+  imageUrl     String
+  categoryId   String
+  category     Category      @relation(fields: [categoryId], references: [id])
+  customFields CustomField[]
+  reviews      Review[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model CustomField {
+  id           String   @id @default(uuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label        String   // e.g. "Family Name", "Est. Year"
+  type         String   // "text" or "number" or "select"
+  placeholder  String?
+  defaultValue String?
+  maxLength    Int?
+  required     Boolean  @default(true)
+  renderX      Float    // percentage offset X from left (0 to 100)
+  renderY      Float    // percentage offset Y from top (0 to 100)
+  renderWidth  Float    // percentage bounding width (0 to 100)
+  renderHeight Float    // percentage bounding height (0 to 100)
+  renderAlign  String   @default("center") // "center", "left", "right"
+  renderColor  String   @default("#3d2511") // default wood burn color
+  fontStyle    String   @default("Great Vibes") // default preview font
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  author    String
+  rating    Int      // 1 to 5
+  text      String
+  verified  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String?
+  passwordHash String
+  role         String        @default("customer") // "customer" or "admin"
+  orders       Order[]
+  createdAt    DateTime      @default(now())
+}
+
+model Order {
+  id           String        @id @default(uuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  total      Float
+  status     String        @default("pending") // "pending", "shipped", "completed"
+  items      OrderItem[]
+  createdAt  DateTime      @default(now())
+}
+
+model OrderItem {
+  id                String   @id @default(uuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId         String
+  productName       String
+  price             Float
+  quantity          Int
+  customizationText String?  // JSON string containing custom engraving fields entered
+}
+
+model Newsletter {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  subscribedAt DateTime      @default(now())
+}
+
+model CustomRequest {
+  id           String        @id @default(uuid())
+  name         String
+  email        String
+  phone        String?
+  message      String
+  status       String        @default("pending") // "pending", "reviewed"
+  createdAt    DateTime      @default(now())
+}
