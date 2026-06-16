@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Session Metadata for Sync Script -->
+  <meta name="session-project" content="bridle-and-birch">
+  <meta name="session-agent" content="antigravity">
+  <meta name="session-start" content="2026-06-16T00:46:00-05:00">
+  <meta name="session-end" content="2026-06-16T01:00:00-05:00">
+  <meta name="session-title" content="Engraving Preview Research & Implementation Strategy">
+  <meta name="session-summary" content="Conducted comprehensive research on e-commerce product personalization rendering technologies. Authored an engraving preview research report comparing client-side (WebGL/SVG) and cloud-based (Dynamic Mockups) tools. Prepared an implementation plan proposing client-side SVG displacement mapping as the optimal MVP solution.">
+  
+  <title>Bridle & Birch Session Diary - June 16, 2026 (Engraving Preview)</title>
+  <style>
+    :root {
+      --ink: #382F26; /* espresso text color */
+      --muted: #736d65;
+      --paper: #f5f4f0; /* pencil.dev cream background */
+      --panel: #ffffff;
+      --line: #ded6c8;
+      --accent: #eab308; /* pencil.dev yellow accent */
+      --accent-dark: #854d0e;
+      --green: #15803d;
+      --blue: #1d4ed8;
+      --red: #b91c1c;
+      --code: #201f1d;
+      --shadow: 0 12px 40px rgba(28, 24, 17, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 0 0 80px;
+    }
+
+    .page {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      background: #0a0a0a; /* pencil.dev cover block background */
+      color: #f5f4f0;
+      border-radius: 12px;
+      padding: 48px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.1;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin: 16px 0 0;
+      color: #c5c4be;
+      font-size: 18px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
+    }
+
+    .meta-card {
+      border-left: 2px solid var(--accent);
+      padding-left: 12px;
+    }
+
+    .meta-card span {
+      display: block;
+      color: #8c8b85;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .meta-card strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    /* Part Headers */
+    .part-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin: 48px 0 24px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .part-num {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 24px;
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    .part-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: #353430;
+    }
+
+    ul {
+      margin: 0 0 16px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin: 6px 0;
+      color: #353430;
+    }
+
+    code {
+      background: #eae9e3;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.9em;
+    }
+
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: #fef9c3;
+      padding: 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .meta-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      header {
+        padding: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav style="margin-bottom: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+      <a href="https://chazstephens.com/dashboards/session-reports/" style="color: var(--muted); text-decoration: none;">&larr; Hosted Session Reports</a>
+    </nav>
+
+    <header>
+      <p class="eyebrow">Bridle & Birch Session Diary</p>
+      <h1>June 16, 2026</h1>
+      <p class="subtitle">Researched live engraving preview tools and formulated an implementation plan utilizing client-side SVG displacement mapping.</p>
+      <div class="meta-grid">
+        <div class="meta-card">
+          <span>Project</span>
+          <strong>bridle-and-birch</strong>
+        </div>
+        <div class="meta-card">
+          <span>Repos touched</span>
+          <strong>bridle-birch-store</strong>
+        </div>
+        <div class="meta-card">
+          <span>Goal</span>
+          <strong>Research engraving live preview</strong>
+        </div>
+        <div class="meta-card">
+          <span>Agent</span>
+          <strong>Antigravity</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="part-header">
+      <span class="part-num">01</span>
+      <h2 class="part-title">Core Research Findings</h2>
+    </div>
+
+    <section>
+      <h3>Engraving Overlay Render Solutions</h3>
+      <p>To move away from flat text layers on top of wood and glass mockups, we researched four core personalization architectures:</p>
+      <ul>
+        <li><strong>Client-Side SVG Displacement (Recommended for MVP):</strong> Uses SVG filters (<code>&lt;feDisplacementMap&gt;</code>) to dynamically warp custom text boundaries along the texture coordinates of a base image, blended using CSS modes (like <code>mix-blend-mode: multiply</code>). Costs nothing and loads instantly.</li>
+        <li><strong>Client-Side WebGL (Three.js):</strong> Renders product assets as true 3D models with normal/bump mapping to catch lighting dynamically. High implementation cost, but supports 3D cylindrical wrap.</li>
+        <li><strong>SaaS Mockup Rendering (Dynamic Mockups API):</strong> Uses uploaded Photoshop templates with Smart Objects, warp maps, and layer styles. Replacing smart object data dynamically generates fully photorealistic mockups on the fly. Requires subscription and introduces 1.5s latency.</li>
+        <li><strong>Server-Side Image Processing (Sharp/ImageMagick):</strong> Executes rendering on edge/server instances to warp and cache product preview images. Complex infrastructure dependency.</li>
+      </ul>
+      <p>A comprehensive analysis was created and saved to <a href="file:///Users/chazstephens/Developer/bridle-birch-store/docs/engraving-preview-research.md">docs/engraving-preview-research.md</a>.</p>
+    </section>
+
+    <div class="part-header">
+      <span class="part-num">02</span>
+      <h2 class="part-title">Proposed Implementation Plan</h2>
+    </div>
+
+    <section>
+      <h3>Client-Side SVG Displacement Plan</h3>
+      <p>We drafted a project implementation plan details-first at <a href="file:///Users/chazstephens/.gemini/antigravity/brain/56a3159e-3e2d-4bad-8d96-1ff210f56bac/implementation_plan.md">implementation_plan.md</a>. The core proposal consists of:</p>
+      <ol>
+        <li><strong>Generating Local Heightmaps:</strong> Storing high-contrast, blurred grayscale images representing the wood/glass texture mapping layers in <code>public/images/heightmaps/</code>.</li>
+        <li><strong>Modifying Preview Component:</strong> Rewriting <code>src/components/engraving-preview.tsx</code> to overlay a dynamic SVG text layer referencing the displacement filter map, applying multiply blending for wood burn and overlay/soft-light blending for frosted glass etches.</li>
+      </ol>
+
+      <div class="callout">
+        <strong>Zero Cost & Instant Loading</strong>
+        <p>By executing displacement entirely in the client's browser, the storefront maintains absolute speed and zero server operational costs, providing immediate customer feedback without visual jitter.</p>
+      </div>
+    </section>
+
+    <div class="part-header">
+      <span class="part-num">03</span>
+      <h2 class="part-title">Next Actions</h2>
+    </div>
+
+    <section>
+      <ul>
+        <li><strong>Select Strategy:</strong> Confirm with the user whether client-side SVG mapping is preferred for the MVP.</li>
+        <li><strong>Prepare Grayscale Heightmaps:</strong> Convert the existing product mockup backgrounds to desaturated, high-contrast, blurred map images to feed the displacement map filter.</li>
+        <li><strong>Update Engraving Component:</strong> Replace the current 2D canvas text render with the SVG filter overlay system in <code>engraving-preview.tsx</code>.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
