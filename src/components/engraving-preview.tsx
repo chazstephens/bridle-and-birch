@@ -28,6 +28,8 @@ interface Product {
   price: number;
   imageUrl: string;
   customFields: CustomField[];
+  productType: string;
+  previewType: string;
 }
 
 interface EngravingPreviewProps {
@@ -70,7 +72,14 @@ export default function EngravingPreview({ product }: EngravingPreviewProps) {
     };
   }, [product.imageUrl]);
 
-  // Redraw the canvas whenever inputs, fonts, or bgImage updates
+  // Helper to map mockup imageUrl to heightmap path
+  const getHeightmapUrl = (url: string) => {
+    const filename = url.split("/").pop() || "";
+    const baseName = filename.substring(0, filename.lastIndexOf("."));
+    return `/images/heightmaps/${baseName}_heightmap.png`;
+  };
+
+  // Redraw the canvas background image when loaded
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !bgImage) return;
@@ -83,53 +92,7 @@ export default function EngravingPreview({ product }: EngravingPreviewProps) {
 
     // Draw background image
     ctx.drawImage(bgImage, 0, 0, 600, 600);
-
-    // Draw each custom field text
-    product.customFields.forEach((cf) => {
-      const text = inputs[cf.id] || cf.placeholder || "";
-      if (!text) return;
-
-      const x = (cf.renderX / 100) * 600;
-      const y = (cf.renderY / 100) * 600;
-      const fontSize = (cf.renderHeight / 100) * 600;
-      const font = fonts[cf.id] || cf.fontStyle;
-
-      // Font formatting
-      ctx.textAlign = (cf.renderAlign as CanvasTextAlign) || "center";
-      ctx.textBaseline = "middle";
-      
-      // Select weight based on font style
-      let weight = "normal";
-      if (font === "Cinzel" || font === "Playfair Display") {
-        weight = "600";
-      } else if (font === "Montserrat") {
-        weight = "500";
-      }
-
-      ctx.font = `${weight} ${fontSize}px '${font}', serif`;
-
-      // Apply realistic blend/effects
-      ctx.save();
-      
-      if (cf.renderColor.includes("rgba(255,255,255") || cf.renderColor.includes("rgba(255, 255, 255") || cf.renderColor === "#ffffff" || cf.renderColor === "white") {
-        // Frosted Glass Effect (White)
-        ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
-        ctx.shadowColor = "rgba(255, 255, 255, 0.4)";
-        ctx.shadowBlur = 2;
-      } else {
-        // Wood Burn Effect (Dark)
-        ctx.fillStyle = cf.renderColor;
-        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-        ctx.shadowBlur = 1;
-        ctx.shadowOffsetY = 1;
-        // Blend mode to simulate wood burn
-        ctx.globalCompositeOperation = "multiply";
-      }
-
-      ctx.fillText(text, x, y);
-      ctx.restore();
-    });
-  }, [bgImage, inputs, fonts, product.customFields]);
+  }, [bgImage]);
 
   const handleInputChange = (fieldId: string, val: string, maxLen: number | null) => {
     let clean = val;
@@ -210,6 +173,118 @@ export default function EngravingPreview({ product }: EngravingPreviewProps) {
             height={600} 
             className="canvas-element" 
           />
+          {/* Overlay SVG for dynamic engraving with displacement filters */}
+          <svg 
+            className="engraving-svg-overlay animate-fade-in" 
+            viewBox="0 0 600 600" 
+            style={{ 
+              position: "absolute", 
+              top: 0, 
+              left: 0, 
+              width: "100%", 
+              height: "100%", 
+              pointerEvents: "none" 
+            }}
+          >
+            <defs>
+              <filter id="engrave-displacement-filter" x="0%" y="0%" width="100%" height="100%">
+                {/* 1. Load the grayscale heightmap image */}
+                <feImage 
+                  href={getHeightmapUrl(product.imageUrl)} 
+                  result="heightmap" 
+                  x="0" 
+                  y="0" 
+                  width="100%" 
+                  height="100%" 
+                  preserveAspectRatio="none"
+                />
+                
+                {/* 2. Displace the text along the wood grain/texture heightmap pixels */}
+                <feDisplacementMap 
+                  in="SourceGraphic" 
+                  in2="heightmap" 
+                  scale={product.productType === "glass" ? 2.0 : product.productType === "leather" ? 4.0 : 6.0} 
+                  xChannelSelector="R" 
+                  yChannelSelector="G" 
+                  result="displaced" 
+                />
+
+                {/* 3. Add soft depth emboss shadow or glow */}
+                {product.productType === "glass" ? (
+                  <>
+                    <feGaussianBlur stdDeviation="0.4" in="SourceGraphic" result="blur" />
+                    <feColorMatrix type="matrix" values="1 0 0 0 1   0 1 0 0 1   0 0 1 0 1   0 0 0 0.85 0" in="blur" result="glow" />
+                    <feMerge>
+                      <feMergeNode in="glow" />
+                      <feMergeNode in="displaced" />
+                    </feMerge>
+                  </>
+                ) : (
+                  <>
+                    <feColorMatrix 
+                      type="matrix" 
+                      values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.45 0" 
+                      in="SourceGraphic" 
+                      result="shadowMask" 
+                    />
+                    <feOffset dx="0.5" dy="1.0" in="shadowMask" result="shadowOffset" />
+                    <feMerge>
+                      <feMergeNode in="shadowOffset" />
+                      <feMergeNode in="displaced" />
+                    </feMerge>
+                  </>
+                )}
+              </filter>
+            </defs>
+
+            {/* Render custom text overlays with displacement filter and mix-blend CSS */}
+            {product.customFields.map((cf) => {
+              const text = inputs[cf.id] || cf.placeholder || "";
+              if (!text) return null;
+
+              const x = (cf.renderX / 100) * 600;
+              const y = (cf.renderY / 100) * 600;
+              const fontSize = (cf.renderHeight / 100) * 600;
+              const font = fonts[cf.id] || cf.fontStyle;
+              const align = cf.renderAlign || "center";
+
+              const textAnchor = align === "left" ? "start" : align === "right" ? "end" : "middle";
+              const isGlass = product.productType === "glass";
+              
+              // Dynamic color and blend styles
+              const fill = isGlass ? "rgba(255, 255, 255, 0.85)" : cf.renderColor;
+              const blendMode = isGlass ? "overlay" as const : "multiply" as const;
+
+              // Select weight based on font style
+              let weight = "normal";
+              if (font === "Cinzel" || font === "Playfair Display") {
+                weight = "600";
+              } else if (font === "Montserrat") {
+                weight = "500";
+              }
+
+              return (
+                <text
+                  key={cf.id}
+                  x={x}
+                  y={y}
+                  fontSize={fontSize}
+                  fontFamily={`'${font}', serif`}
+                  fontWeight={weight}
+                  textAnchor={textAnchor}
+                  dominantBaseline="middle"
+                  fill={fill}
+                  style={{
+                    filter: "url(#engrave-displacement-filter)",
+                    mixBlendMode: blendMode,
+                    opacity: isGlass ? 0.9 : 0.95
+                  }}
+                >
+                  {text}
+                </text>
+              );
+            })}
+          </svg>
         </div>
         
         <p style={{ fontSize: "0.75rem", color: "var(--color-text-light)", marginTop: "12px", textAlign: "center" }}>
