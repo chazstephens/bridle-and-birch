@@ -1,19 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Marcellus&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
 :root {
-  /* Colors */
-  --color-primary: #1b3b2b;       /* Forest Green */
-  --color-primary-light: #2c543f;
-  --color-accent: #b3925c;        /* Muted Gold / Brass */
-  --color-accent-light: #c5a880;
-  --color-background: #faf8f5;    /* Warm Cream */
-  --color-surface: #ffffff;
-  --color-surface-soft: #f4f1eb;  /* Soft Warm Sand */
-  --color-text: #2c2a29;          /* Espresso / Dark Charcoal */
-  --color-text-light: #6e6966;
-  --color-border: #e3ded6;
+  /* Brand Tokens */
+  --bb-ivory: #F7F3EC;
+  --bb-cream: #FFF9F1;
+  --bb-espresso: #382F26;
+  --bb-walnut: #72543D;
+  --bb-taupe: #8C7D70;
+  --bb-clay: #A68B7C;
+  --bb-brass: #C5A880;
+  --bb-linen: #EFEBE4;
+
+  /* Theme Mapping */
+  --color-primary: var(--bb-walnut);
+  --color-primary-light: var(--bb-clay);
+  --color-accent: var(--bb-brass);
+  --color-accent-light: #dfcbb0;
+  --color-background: var(--bb-ivory);
+  --color-surface: var(--bb-cream);
+  --color-surface-soft: var(--bb-linen);
+  --color-text: var(--bb-espresso);
+  --color-text-light: var(--bb-taupe);
+  --color-border: #E5DFD5;
   --color-error: #9a3412;
-  --color-success: #166534;
+  --color-success: #1b3b2b; /* Forest Green as success / premium accent */
   
   /* Fonts */
   --font-serif: 'Playfair Display', Georgia, serif;
@@ -25,9 +35,9 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 16px;
-  --shadow-sm: 0 2px 4px rgba(44, 42, 41, 0.05);
-  --shadow-md: 0 8px 16px rgba(44, 42, 41, 0.08);
-  --shadow-lg: 0 16px 32px rgba(44, 42, 41, 0.12);
+  --shadow-sm: 0 2px 4px rgba(56, 47, 38, 0.05);
+  --shadow-md: 0 8px 16px rgba(56, 47, 38, 0.08);
+  --shadow-lg: 0 16px 32px rgba(56, 47, 38, 0.12);
   
   /* Transition */
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

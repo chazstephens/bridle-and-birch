@@ -43,10 +43,13 @@ async function main() {
   const board = await prisma.product.create({
     data: {
       name: "Acacia Wood Charcuterie Board",
+      slug: "acacia-charcuterie-board",
       description: "Handcrafted from premium acacia wood with a live edge and convenient handle. Perfect for entertaining, serving, and display. Wrapped in a delicate signature cream bow.",
       price: 58.00,
       imageUrl: "/images/mockups/charcuterie_board.jpg",
       categoryId: kitchen.id,
+      productType: "wood",
+      previewType: "cutting_board",
       customFields: {
         create: [
           {
@@ -102,10 +105,13 @@ async function main() {
   const decanter = await prisma.product.create({
     data: {
       name: "Engraved Decanter & Whiskey Glasses Set",
+      slug: "whiskey-decanter-set",
       description: "An elegant glass decanter paired with two matching lowball glasses. Features a frosted monogram engraving of your choice, evoking timeless southern sophistication.",
       price: 85.00,
       imageUrl: "/images/mockups/whiskey_set.jpg",
       categoryId: barware.id,
+      productType: "glass",
+      previewType: "drinkware",
       customFields: {
         create: [
           {
@@ -141,10 +147,13 @@ async function main() {
   const notebook = await prisma.product.create({
     data: {
       name: "Personalized Leatherette Journal",
+      slug: "leatherette-journal",
       description: "Richly textured leatherette journal, offering the look and feel of genuine leather. Laser engraved with a clean, dark debossed finish.",
       price: 24.00,
       imageUrl: "/images/mockups/notebook.jpg",
       categoryId: home.id,
+      productType: "leather",
+      previewType: "no_preview",
       customFields: {
         create: [
           {
@@ -180,10 +189,13 @@ async function main() {
   const coasters = await prisma.product.create({
     data: {
       name: "Marble & Acacia Wood Coaster Set",
+      slug: "marble-acacia-coasters",
       description: "Set of four hexagonal coasters blending clean white marble and warm acacia wood. Laser engraved with matching monogram initials.",
       price: 32.00,
       imageUrl: "/images/mockups/coasters.jpg",
       categoryId: kitchen.id,
+      productType: "wood",
+      previewType: "coaster",
       customFields: {
         create: [
           {
@@ -219,10 +231,13 @@ async function main() {
   const realtorGift = await prisma.product.create({
     data: {
       name: "Premium Realtor Closing Gift Set",
+      slug: "realtor-closing-gift-set",
       description: "The ultimate welcome home gift. Contains a large customized cutting board, a matching set of 4 coasters, and a laser-engraved wooden handle corkscrew.",
       price: 120.00,
       imageUrl: "/images/mockups/realtor_set.jpg",
       categoryId: gifts.id,
+      productType: "wood",
+      previewType: "no_preview",
       customFields: {
         create: [
           {

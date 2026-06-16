@@ -26,11 +26,11 @@ export default function AboutPage() {
             “Hospitality isn’t about making things perfect; it’s about making people feel welcome and valued.”
           </h2>
           
-          <p style={{ color: "var(--color-text)", fontSize: "1.05rem", leading: 1.8 }}>
+          <p style={{ color: "var(--color-text)", fontSize: "1.05rem", lineHeight: 1.8 }}>
             Growing up in the heart of the South, founder Jana Stephens learned early on that the best conversations happen around a shared table, and the most memorable gifts are the ones that hold a personal connection. With a passion for design and a love of laser engraving, she created **Bridle & Birch** to bring that warmth and Southern charm to homes everywhere.
           </p>
 
-          <p style={{ color: "var(--color-text-light)", leading: 1.7 }}>
+          <p style={{ color: "var(--color-text-light)", lineHeight: 1.7 }}>
             The name <em>Bridle & Birch</em> represents two sides of the brand: the refined heritage and elegance of equestrian life (the bridle), and the rustic, organic beauty of the natural world (the birch). Together, they form a perfect harmony of polished details and organic textures.
           </p>
 
@@ -57,7 +57,7 @@ export default function AboutPage() {
           </div>
 
           <h3 style={{ fontFamily: "var(--font-serif)", fontSize: "1.4rem", color: "var(--color-primary)", marginTop: "16px" }}>Our Promise to You</h3>
-          <p style={{ color: "var(--color-text-light)", leading: 1.7 }}>
+          <p style={{ color: "var(--color-text-light)", lineHeight: 1.7 }}>
             We work with the finest sustainable acacia wood, rich slate stone, and premium glassware to ensure that every engraving is clean, crisp, and high-contrast. If you have a custom design request or a corporate inquiry for closing gifts, we would be honored to bring your vision to life.
           </p>
 

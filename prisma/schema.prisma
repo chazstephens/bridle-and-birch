@@ -15,17 +15,27 @@ model Category {
 }
 
 model Product {
-  id           String        @id @default(uuid())
-  name         String
-  description  String
-  price        Float
-  imageUrl     String
-  categoryId   String
-  category     Category      @relation(fields: [categoryId], references: [id])
-  customFields CustomField[]
-  reviews      Review[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id            String        @id @default(uuid())
+  name          String
+  slug          String        @unique
+  description   String
+  price         Float
+  imageUrl      String
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id])
+  active        Boolean       @default(true)
+  productType   String        @default("wood") // "wood", "glass", "leather", "acrylic"
+  previewType   String        @default("no_preview") // "cutting_board", "stemware", "drinkware", "ornament", "tray", "sign", "coaster", "no_preview"
+  turnaround    String        @default("2-4 business days")
+  shippingClass String        @default("standard")
+  seoTitle      String?
+  seoDesc       String?
+  badges        String?       // Comma-separated list (e.g. "Best Seller", "New")
+  customFields  CustomField[]
+  reviews       Review[]
+  orderItems    OrderItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model CustomField {
@@ -83,6 +93,7 @@ model OrderItem {
   orderId           String
   order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId         String
+  product           Product  @relation(fields: [productId], references: [id])
   productName       String
   price             Float
   quantity          Int
@@ -96,11 +107,14 @@ model Newsletter {
 }
 
 model CustomRequest {
-  id           String        @id @default(uuid())
-  name         String
-  email        String
-  phone        String?
-  message      String
-  status       String        @default("pending") // "pending", "reviewed"
-  createdAt    DateTime      @default(now())
+  id              String        @id @default(uuid())
+  name            String
+  email           String
+  phone           String?
+  occasion        String?       // e.g. "Wedding", "Corporate Closing", "Holiday"
+  quantity        Int           @default(1)
+  message         String
+  uploadedFileUrl String?       // Simulated storage URL
+  status          String        @default("pending") // "pending", "reviewed"
+  createdAt       DateTime      @default(now())
 }

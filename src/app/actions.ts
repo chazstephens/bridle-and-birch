@@ -143,10 +143,21 @@ export async function submitCustomRequestAction(prevState: any, formData: FormDa
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
+  const occasion = formData.get("occasion") as string;
+  const quantityStr = formData.get("quantity") as string;
   const message = formData.get("message") as string;
+  const file = formData.get("file") as File | null;
 
   if (!name || !email || !message) {
-    return { success: false, error: "Name, email, and message are required." };
+    return { success: false, error: "Name, email, and message details are required." };
+  }
+
+  const quantity = quantityStr ? parseInt(quantityStr, 10) : 1;
+
+  let uploadedFileUrl = null;
+  if (file && file.size > 0) {
+    // Simulate uploading vector / logo file. In production, this uploads to Supabase storage.
+    uploadedFileUrl = `/uploads/custom_requests/${Date.now()}_${file.name}`;
   }
 
   try {
@@ -155,11 +166,17 @@ export async function submitCustomRequestAction(prevState: any, formData: FormDa
         name,
         email,
         phone: phone || null,
+        occasion: occasion || null,
+        quantity: isNaN(quantity) ? 1 : quantity,
         message,
+        uploadedFileUrl,
         status: "pending"
       }
     });
-    return { success: true, message: "Your custom request has been submitted successfully! We will contact you soon." };
+    return { 
+      success: true, 
+      message: "Your custom request has been submitted successfully! We will verify your design files and reach out soon." 
+    };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to submit request." };
   }
@@ -193,6 +210,11 @@ export async function createProductAction(prevState: any, data: {
   price: number;
   imageUrl: string;
   categoryId: string;
+  productType: string;
+  previewType: string;
+  turnaround: string;
+  shippingClass: string;
+  badges?: string;
   customFields: {
     label: string;
     type: string;
@@ -211,20 +233,45 @@ export async function createProductAction(prevState: any, data: {
     return { success: false, error: "Unauthorized access." };
   }
 
-  const { name, description, price, imageUrl, categoryId, customFields } = data;
+  const { 
+    name, 
+    description, 
+    price, 
+    imageUrl, 
+    categoryId, 
+    productType, 
+    previewType, 
+    turnaround, 
+    shippingClass, 
+    badges, 
+    customFields 
+  } = data;
 
   if (!name || !description || !price || !categoryId || !imageUrl) {
     return { success: false, error: "All product fields are required." };
   }
 
+  // Generate unique slug
+  const baseSlug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+  const slug = `${baseSlug}-${Math.floor(1000 + Math.random() * 9000)}`;
+
   try {
     const product = await prisma.product.create({
       data: {
         name,
+        slug,
         description,
         price,
         imageUrl,
         categoryId,
+        productType: productType || "wood",
+        previewType: previewType || "no_preview",
+        turnaround: turnaround || "2-4 business days",
+        shippingClass: shippingClass || "standard",
+        badges: badges || null,
         customFields: {
           create: customFields.map(cf => ({
             label: cf.label,
