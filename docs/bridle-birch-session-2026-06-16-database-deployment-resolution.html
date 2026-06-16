@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Session Metadata for Sync Script -->
+  <meta name="session-project" content="bridle-and-birch">
+  <meta name="session-agent" content="antigravity">
+  <meta name="session-start" content="2026-06-16T17:03:00-05:00">
+  <meta name="session-end" content="2026-06-16T17:35:00-05:00">
+  <meta name="session-title" content="Database Configuration & Netlify Deploy Resolution">
+  <meta name="session-summary" content="Resolved Netlify deployment errors by updating the database provider to postgresql, upgrading the build scripts to trigger automatic client generation, and configuring the Prisma Pg adapter for runtime queries. Verified the compilation locally and pushed clean updates to GitHub.">
+  
+  <title>Bridle & Birch Session Diary - June 16, 2026 (Part 2)</title>
+  <style>
+    :root {
+      --ink: #382F26; /* espresso text color */
+      --muted: #736d65;
+      --paper: #f5f4f0; /* pencil.dev cream background */
+      --panel: #ffffff;
+      --line: #ded6c8;
+      --accent: #eab308; /* pencil.dev yellow accent */
+      --accent-dark: #854d0e;
+      --green: #15803d;
+      --blue: #1d4ed8;
+      --red: #b91c1c;
+      --code: #201f1d;
+      --shadow: 0 12px 40px rgba(28, 24, 17, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 0 0 80px;
+    }
+
+    .page {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      background: #0a0a0a; /* pencil.dev cover block background */
+      color: #f5f4f0;
+      border-radius: 12px;
+      padding: 48px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.1;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin: 16px 0 0;
+      color: #c5c4be;
+      font-size: 18px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
+    }
+
+    .meta-card {
+      border-left: 2px solid var(--accent);
+      padding-left: 12px;
+    }
+
+    .meta-card span {
+      display: block;
+      color: #8c8b85;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .meta-card strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    /* Part Headers */
+    .part-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin: 48px 0 24px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .part-num {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 24px;
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    .part-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: #353430;
+    }
+
+    ul {
+      margin: 0 0 16px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin: 6px 0;
+      color: #353430;
+    }
+
+    code {
+      background: #eae9e3;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.9em;
+    }
+
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: #fef9c3;
+      padding: 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .meta-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      header {
+        padding: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav style="margin-bottom: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+      <a href="https://chazstephens.com/dashboards/session-reports/" style="color: var(--muted); text-decoration: none;">&larr; Hosted Session Reports</a>
+    </nav>
+
+    <header>
+      <p class="eyebrow">Bridle & Birch Session Diary (Part 2)</p>
+      <h1>June 16, 2026</h1>
+      <p class="subtitle">Resolved Netlify client generation errors and converted the datasource configurations and schema definition to use PostgreSQL with active connection pool adapters.</p>
+      <div class="meta-grid">
+        <div class="meta-card">
+          <span>Project</span>
+          <strong>bridle-and-birch</strong>
+        </div>
+        <div class="meta-card">
+          <span>Repos touched</span>
+          <strong>bridle-birch-store</strong>
+        </div>
+        <div class="meta-card">
+          <span>Goal</span>
+          <strong>Resolve Netlify Deploy Errors & Database Configuration</strong>
+        </div>
+        <div class="meta-card">
+          <span>Agent</span>
+          <strong>Antigravity</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="part-header">
+      <span class="part-num">01</span>
+      <h2 class="part-title">Resolved Issues</h2>
+    </div>
+
+    <section>
+      <h3>Fixing Prisma 7 Build Errors</h3>
+      <p>The initial Netlify deploy failed during Next.js compilation because the generated Prisma client files were not present in the CI workspace. We made the following changes to ensure a successful build:</p>
+      <ul>
+        <li><strong>Build Automation</strong>: Modified <code>package.json</code>'s <code>build</code> script from <code>next build</code> to <code>prisma generate && next build</code>. This guarantees the client is generated automatically in any clean CI environment before compilation.</li>
+        <li><strong>Prisma 7 Compatibility</strong>: Updated <code>prisma/schema.prisma</code> provider to <code>postgresql</code>. In Prisma 7, connection URLs are no longer supported inside the schema file, so we removed the <code>url = env("DATABASE_URL")</code> property, delegating connection settings entirely to <code>prisma.config.ts</code>.</li>
+        <li><strong>PostgreSQL Adapter Migration</strong>: Swapped the local SQLite driver adapter in <code>src/lib/prisma.ts</code> for the standard PostgreSQL Pool and WASM-based <code>@prisma/adapter-pg</code> connection wrapper.</li>
+      </ul>
+      <p>The repository changes compile successfully locally using a mock PostgreSQL connection string and have been committed and pushed to the <code>main</code> branch on GitHub.</p>
+    </section>
+
+    <div class="part-header">
+      <span class="part-num">02</span>
+      <h2 class="part-title">Verified Build Status</h2>
+    </div>
+
+    <section>
+      <p>Running the production build locally verified that all routes compile clean:</p>
+      <ul>
+        <li>Client generated to <code>./src/generated/prisma</code> in 31ms.</li>
+        <li>TypeScript validation passed without any errors.</li>
+        <li>Next.js successfully collected and pre-rendered all static/dynamic routes (such as <code>/admin</code> and <code>/products/[id]</code>) using the mock database.</li>
+      </ul>
+    </section>
+
+    <div class="part-header">
+      <span class="part-num">03</span>
+      <h2 class="part-title">Next Action items</h2>
+    </div>
+
+    <section>
+      <ul>
+        <li><strong>Netlify Auto-deploy Check</strong>: Observe the new Netlify deployment triggered by the latest commit push (commit ID: <code>b483da0</code>). It should build and succeed automatically now.</li>
+        <li><strong>Database Migration and Seeding</strong>: Set the local <code>DATABASE_URL</code> variable to your Supabase connection string and run <code>npx prisma db push</code> followed by <code>npx prisma db seed</code> to prepare your live database tables.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
