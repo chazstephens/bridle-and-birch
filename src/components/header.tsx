@@ -149,9 +149,11 @@ function IconBtn({
 function MegaMenu({
   label,
   items,
+  tiles,
 }: {
   label: string;
   items: { label: string; href: string }[];
+  tiles?: { label: string; desc: string; href: string; tone: string }[];
 }) {
   const [open, setOpen] = useState(false);
   // Timer ref — lets the mouse cross the gap between the trigger button and the
@@ -208,7 +210,85 @@ function MegaMenu({
         </span>
       </button>
 
-      {open && (
+      {open && tiles ? (
+        /* ── Image-tile grid dropdown (e.g. Shop) ───────────── */
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 12px)",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 480,
+            background: "var(--surface-card)",
+            border: "var(--border-1)",
+            borderRadius: "var(--radius-lg)",
+            boxShadow: "var(--shadow-lg)",
+            padding: 20,
+            zIndex: 200,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+          }}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        >
+          {tiles.map((tile) => (
+            <Link
+              key={tile.href}
+              href={tile.href}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+                height: 140,
+                borderRadius: "var(--radius-md)",
+                background: tile.tone,
+                padding: "16px 14px",
+                overflow: "hidden",
+                position: "relative",
+                transition: "transform var(--dur-fast), box-shadow var(--dur-fast)",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-md)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = "";
+                (e.currentTarget as HTMLElement).style.boxShadow = "";
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 600,
+                  fontSize: 15,
+                  color: "var(--bb-ivory)",
+                  lineHeight: 1.2,
+                  marginBottom: 4,
+                  textShadow: "0 1px 4px rgba(0,0,0,0.25)",
+                }}
+              >
+                {tile.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: 12,
+                  color: "rgba(247,243,236,0.82)",
+                  lineHeight: 1.45,
+                  overflow: "hidden",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                } as React.CSSProperties}
+              >
+                {tile.desc}
+              </span>
+            </Link>
+          ))}
+        </div>
+      ) : open ? (
+        /* ── Text-list dropdown (e.g. Occasions) ────────────── */
         <div
           style={{
             position: "absolute",
@@ -254,7 +334,7 @@ function MegaMenu({
             </Link>
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
