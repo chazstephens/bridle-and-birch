@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Gift, Heart, ShieldCheck, Award, Pencil, Clock, Star, Truck } from "lucide-react";
@@ -343,7 +345,7 @@ export default async function Home() {
                   <CategoryTile
                     key={cat.id}
                     title={cat.name}
-                    blurb={cat.description ?? ""}
+                    blurb={""}
                     href={`/products?category=${cat.slug}`}
                     tone={
                       (["linen", "maple", "walnut", "cherry", "cream"] as const)[
@@ -456,7 +458,7 @@ export default async function Home() {
                       slug={p.slug}
                       name={p.name}
                       category={p.category?.name ?? ""}
-                      price={`Starting at $${p.basePrice}`}
+                      price={`Starting at $${p.price.toFixed(2)}`}
                       rating={avgRating}
                       reviews={p.reviews.length || undefined}
                       tone="walnut"

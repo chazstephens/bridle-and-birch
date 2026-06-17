@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -120,7 +122,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     },
     include: {
       category: true,
-      customFields: { orderBy: { createdAt: "asc" } },
+      customFields: { orderBy: { id: "asc" } },
       reviews: { orderBy: { createdAt: "desc" } },
     },
   });
