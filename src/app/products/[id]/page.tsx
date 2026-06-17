@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { getPlaceholderBySlug } from "@/lib/placeholder-products";
 import EngravingPreview from "@/components/engraving-preview";
 import { Star, Truck, Calendar, ShieldCheck, ArrowLeft, Send, CheckCircle2 } from "lucide-react";
 import { submitReviewAction } from "@/app/actions";
@@ -116,16 +117,24 @@ function TrustItem({
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
 
-  const product = await prisma.product.findFirst({
-    where: {
-      OR: [{ id }, { slug: id }],
-    },
-    include: {
-      category: true,
-      customFields: { orderBy: { id: "asc" } },
-      reviews: { orderBy: { createdAt: "desc" } },
-    },
-  });
+  // Try the database first; fall back to placeholder data when no production
+  // database is connected. Using catch() so a missing DATABASE_URL doesn't
+  // result in a 500 — it gracefully degrades to the placeholder catalog.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let product: any = await prisma.product
+    .findFirst({
+      where: { OR: [{ id }, { slug: id }] },
+      include: {
+        category: true,
+        customFields: { orderBy: { id: "asc" } },
+        reviews: { orderBy: { createdAt: "desc" } },
+      },
+    })
+    .catch(() => null);
+
+  if (!product || !product.active) {
+    product = getPlaceholderBySlug(id) ?? null;
+  }
 
   if (!product || !product.active) {
     notFound();
@@ -133,8 +142,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const avgRating =
     product.reviews.length > 0
-      ? product.reviews.reduce((acc, r) => acc + r.rating, 0) /
-        product.reviews.length
+      ? product.reviews.reduce(
+          (acc: number, r: { rating: number }) => acc + r.rating,
+          0
+        ) / product.reviews.length
       : null;
 
   async function handlePostReview(formData: FormData) {
@@ -341,7 +352,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <TrustItem
               icon={<Calendar size={17} />}
               heading="Handcraft Turnaround"
-              body={`Custom engraving is completed in ${(product as Record<string, unknown>).turnaround ?? "5–7 business days"}. Rush orders available at checkout.`}
+              body={`Custom engraving is completed in ${product.turnaround ?? "5–7 business days"}. Rush orders available at checkout.`}
             />
             <TrustItem
               icon={<Truck size={17} />}
@@ -485,7 +496,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </p>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-                  {product.reviews.map((review, i) => (
+                  {product.reviews.map((review: { id: string; rating: number; verified: boolean; text: string; author: string; createdAt: Date }, i: number) => (
                     <div
                       key={review.id}
                       style={{

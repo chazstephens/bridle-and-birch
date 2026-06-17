@@ -465,15 +465,16 @@ export default async function Home() {
                     />
                   );
                 })
-              : // Fallback cards
+              : // Fallback cards — slugs match the placeholder product catalog
                 [
-                  { name: "Family Heirloom Cutting Board", category: "Cutting Boards", price: "Starting at $58" },
-                  { name: "Whiskey & Decanter Set", category: "Bar Sets", price: "Starting at $78" },
-                  { name: "Marble Coaster Set", category: "Coasters", price: "Starting at $42" },
-                  { name: "Baby Name Block", category: "Baby & Kids", price: "Starting at $36" },
+                  { name: "Family Heirloom Cutting Board", slug: "family-heirloom-cutting-board", category: "Cutting Boards", price: "Starting at $58" },
+                  { name: "Whiskey & Decanter Set", slug: "whiskey-decanter-set", category: "Bar Sets", price: "Starting at $78" },
+                  { name: "Marble Coaster Set", slug: "marble-coaster-set", category: "Coasters", price: "Starting at $42" },
+                  { name: "Baby Name Block", slug: "baby-name-block", category: "Baby & Kids", price: "Starting at $36" },
                 ].map((p, i) => (
                   <ProductCard
                     key={p.name}
+                    slug={p.slug}
                     name={p.name}
                     category={p.category}
                     price={p.price}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "./cart-context";
@@ -49,6 +49,33 @@ const SHOP_MENU = [
   { label: "Baby & Kids", href: "/products?category=baby" },
   { label: "Signs & Plaques", href: "/products?category=signs" },
   { label: "View All Products", href: "/products" },
+];
+
+const SHOP_TILES = [
+  {
+    label: "Cutting Boards",
+    desc: "Handcrafted boards engraved with your family name, recipe, or…",
+    href: "/products?category=cutting-boards",
+    tone: "linear-gradient(140deg, #8A6647 0%, #5E422D 100%)",
+  },
+  {
+    label: "Baby & Kids",
+    desc: "Personalized keepsakes to celebrate life's newest arrivals —…",
+    href: "/products?category=baby",
+    tone: "linear-gradient(140deg, #C4A882 0%, #A07B55 100%)",
+  },
+  {
+    label: "Wedding & Bridal",
+    desc: "Timeless engraved gifts for the couple — perfect for ceremonies…",
+    href: "/products?occasion=wedding",
+    tone: "linear-gradient(140deg, #9EA88A 0%, #6B7557 100%)",
+  },
+  {
+    label: "Kitchen",
+    desc: "Elevate everyday cooking with personalized kitchen essentials…",
+    href: "/products?category=coasters",
+    tone: "linear-gradient(140deg, #7A5E46 0%, #4E3829 100%)",
+  },
 ];
 
 const OCCASIONS_MENU = [
@@ -127,12 +154,29 @@ function MegaMenu({
   items: { label: string; href: string }[];
 }) {
   const [open, setOpen] = useState(false);
+  // Timer ref — lets the mouse cross the gap between the trigger button and the
+  // dropdown panel without closing the menu. The wrapper div's hit box is only
+  // as tall as the button; entering the 12px gap fires onMouseLeave on the
+  // wrapper. The timer gives the mouse 150ms to re-enter a child element before
+  // we actually close.
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function cancelClose() {
+    if (closeTimer.current !== null) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }
+
+  function scheduleClose() {
+    closeTimer.current = setTimeout(() => setOpen(false), 150);
+  }
 
   return (
     <div
       style={{ position: "relative" }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={() => { cancelClose(); setOpen(true); }}
+      onMouseLeave={scheduleClose}
     >
       <button
         style={{
@@ -179,6 +223,8 @@ function MegaMenu({
             padding: "10px 0",
             zIndex: 200,
           }}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
         >
           {items.map((item) => (
             <Link
